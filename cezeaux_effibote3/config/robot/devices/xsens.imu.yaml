@@ -3,7 +3,7 @@ driver:
   package: xsens_driver
   executable: mtnode.py
   parameters:
-    device: /dev/serial/by-id/usb-Xsens_MTi_USB_Converter_DB78D98V-if00-port0
+    device: /dev/serial/by-id/usb-FTDI_FT230X_Basic_UART_DK0EAOWB-if00-port0
     baudrate: 921600
 configuration:
   type: xsens
