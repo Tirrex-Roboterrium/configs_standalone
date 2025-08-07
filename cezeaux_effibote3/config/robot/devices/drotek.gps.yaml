@@ -1,0 +1,28 @@
+name: gps
+driver:
+  package: romea_gps_driver
+  executable: serial_node
+  parameters:
+    device: /dev/serial/by-id/usb-u-blox_AG_-_www.u-blox.com_u-blox_GNSS_receiver-if00
+    baudrate: 115200
+ntrip:
+  package: ntrip_client
+  executable: ntrip_ros.py
+  parameters:
+    host: crtk.net
+    port: 2101
+    username: centipede
+    password: centipede
+    mountpoint: PHAC
+configuration:
+  type: drotek
+  model: f9p
+  rate: 10
+  dual_antenna: false
+geometry:
+  parent_link: base_link
+  xyz: [0.0, 0.0, 1.5]
+records:
+  nmea_sentence: true
+  gps_fix: false
+  vel: false

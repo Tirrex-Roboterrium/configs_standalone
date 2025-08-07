@@ -1,0 +1,74 @@
+services:
+  robot:
+    image: ghcr.io/tirrex-roboterrium/tirrex_workspace:full
+    volumes:
+      - ./config:/config                     # give the current configuration to the robot
+      - /dev:/dev                            # access devices (joystick, serial, ...)
+      - /tmp/.X11-unix:/tmp/.X11-unix:Z      # to open graphical interfaces
+      - $XDG_RUNTIME_DIR:$XDG_RUNTIME_DIR:Z  # used by some graphical programs
+      - /etc/timezone:/etc/timezone:ro       # to use the correct date
+      - /etc/localtime:/etc/localtime:ro     # to use the correct date
+    environment:
+      - ROS_LOCALHOST_ONLY=1  # avoid sending multicast on the local network of your office
+      - DISPLAY               # share the current graphical server
+      - XDG_RUNTIME_DIR       # share the runtime dir (used by som graphical programs)
+    network_mode: host
+    pid: host  # required for ROS2
+    ipc: host  # required for ROS2, Qt and X11 (for shared memory)
+    stop_signal: SIGINT  # Correctly forward SIGINT on services started with 'compose up'
+    command: >-
+      ros2 launch tirrex_demo core.launch.py
+        demo_config_directory:=/config
+        robot_config_directory:=/config/robot
+        robot_namespace:=robot
+        mode:=live
+
+  bash:  # open a shell in the tirrex workspace
+    extends:
+      service: robot
+    profiles: [optional]
+    command: bash
+
+  localisation:  # compute absolute localization using GNSS, IMU and odometry measurements
+    extends:
+      service: robot
+    depends_on: [robot]
+    profiles: [optional]
+    command: >-
+      ros2 launch tirrex_demo robot_localisation.launch.py
+        demo_config_directory:=/config
+        robot_config_directory:=/config/robot
+        mode:=live
+        robot_namespace:=robot
+
+  path_following:  # control the robot to follow the specified trajectory file
+    extends:
+      service: robot
+    depends_on: [localisation]
+    profiles: [optional]
+    command: >-
+      ros2 launch tirrex_demo robot_path_following.launch.py
+        demo_config_directory:=/config
+        robot_config_directory:=/config/robot
+        mode:=live
+        robot_namespace:=robot
+        trajectory_filename:=effibot_test1.traj
+
+  path_recorder:  # record a trajectory file from the current localization
+    extends:
+      service: robot
+    depends_on: [localisation]
+    profiles: [optional]
+    command: >-
+      ros2 launch tirrex_demo robot_path_recorder.launch.py
+        demo_config_directory:=/config
+        robot_config_directory:=/config/robot
+        mode:=live
+        robot_namespace:=robot
+        trajectory_filename:=/config/paths/recorded.traj
+
+  rviz:  # start evaluation nodes and publish information for rviz
+    extends:
+      service: robot
+    profiles: [optional]
+    command: rviz2 -d /config/default.rviz
