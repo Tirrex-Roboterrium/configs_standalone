@@ -73,7 +73,7 @@ services:
         robot_namespace:=robot
         trajectory_filename:=/config/paths/recorded.traj
 
-  rviz:  # start evaluation nodes and publish information for rviz
+  rviz:  # open rviz
     extends:
       service: robot
     profiles: [optional]

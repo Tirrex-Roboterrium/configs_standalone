@@ -6,7 +6,7 @@ It is optional but used by _rqt_runtime_monitor_ and _rviz_.
 xhost +local:docker
 ```
 
-After that you can start everything using
+After that you can start the robot using
 ```
 docker compose up
 ```
