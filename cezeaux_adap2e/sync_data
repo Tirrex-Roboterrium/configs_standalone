@@ -1,0 +1,9 @@
+#!/bin/bash
+cd -- $(dirname "${BASH_SOURCE[0]}")
+
+host="cyrille@192.168.13.1"
+local_path="."
+remote_path="standalone/data"
+ssh_cmd="ssh -qo StrictHostKeyChecking=no"  # all the robots share the same local IP
+
+rsync -avc -e "${ssh_cmd}" "${host}:${remote_path}" "${local_path}"
