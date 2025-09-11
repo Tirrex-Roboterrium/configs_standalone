@@ -74,13 +74,13 @@ services:
         robot_config_directory:=$$ROBOT_CONFIG_DIR
         robot_namespace:=$$ROBOT_NAMESPACE
         mode:=$$DEMO_MODE
-        trajectory_filename:=/config/paths/recorded.traj
+        trajectory_filename:=$$CONFIG_DIR/paths/recorded.traj
 
   rviz:  # start evaluation nodes and publish information for rviz
     extends:
       service: robot
     profiles: [optional]
-    command: rviz2 -d /config/default.rviz
+    command: rviz2 -d $$CONFIG_DIR/default.rviz
 
   record:
     extends:

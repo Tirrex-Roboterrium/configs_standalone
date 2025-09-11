@@ -17,3 +17,4 @@ geometry:
 records:
   scan: false
   points: true
+  imu: true

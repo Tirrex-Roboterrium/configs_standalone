@@ -3,11 +3,17 @@ services:
     image: ghcr.io/tirrex-roboterrium/tirrex_workspace:full
     volumes:
       - ./config:/config                     # give the current configuration to the robot
+      - ./data:/data                         # data dir is used to save records
       - /dev:/dev                            # access devices (joystick, serial, ...)
       - /tmp/.X11-unix:/tmp/.X11-unix:Z      # to open graphical interfaces
       - /etc/timezone:/etc/timezone:ro       # to use the correct date
       - /etc/localtime:/etc/localtime:ro     # to use the correct date
     environment:
+      - CONFIG_DIR=/config
+      - ROBOT_CONFIG_DIR=/config/robot
+      - DEMO_MODE=live
+      - DEMO_NAME=cezeaux_effibote3
+      - ROBOT_NAMESPACE=robot
       - DISPLAY               # share the current graphical server
       - XDG_RUNTIME_DIR       # share the runtime dir (used by som graphical programs)
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp  # specify the ROS2 library used to communicate
@@ -24,10 +30,10 @@ services:
     stop_signal: SIGINT  # Correctly forward SIGINT on services started with 'compose up'
     command: >-
       ros2 launch tirrex_demo core.launch.py
-        demo_config_directory:=/config
-        robot_config_directory:=/config/robot
-        robot_namespace:=robot
-        mode:=live
+        demo_config_directory:=$$CONFIG_DIR
+        robot_config_directory:=$$ROBOT_CONFIG_DIR
+        robot_namespace:=$$ROBOT_NAMESPACE
+        mode:=$$DEMO_MODE
 
   bash:  # open a shell in the tirrex workspace
     extends:
@@ -42,10 +48,10 @@ services:
     profiles: [optional]
     command: >-
       ros2 launch tirrex_demo robot_localisation.launch.py
-        demo_config_directory:=/config
-        robot_config_directory:=/config/robot
-        mode:=live
-        robot_namespace:=robot
+        demo_config_directory:=$$CONFIG_DIR
+        robot_config_directory:=$$ROBOT_CONFIG_DIR
+        robot_namespace:=$$ROBOT_NAMESPACE
+        mode:=$$DEMO_MODE
 
   path_following:  # control the robot to follow the specified trajectory file
     extends:
@@ -54,10 +60,10 @@ services:
     profiles: [optional]
     command: >-
       ros2 launch tirrex_demo robot_path_following.launch.py
-        demo_config_directory:=/config
-        robot_config_directory:=/config/robot
-        mode:=live
-        robot_namespace:=robot
+        demo_config_directory:=$$CONFIG_DIR
+        robot_config_directory:=$$ROBOT_CONFIG_DIR
+        robot_namespace:=$$ROBOT_NAMESPACE
+        mode:=$$DEMO_MODE
         trajectory_filename:=recorded.traj
 
   path_recorder:  # record a trajectory file from the current localization
@@ -67,14 +73,26 @@ services:
     profiles: [optional]
     command: >-
       ros2 launch tirrex_demo robot_path_recorder.launch.py
-        demo_config_directory:=/config
-        robot_config_directory:=/config/robot
-        mode:=live
-        robot_namespace:=robot
-        trajectory_filename:=/config/paths/recorded.traj
+        demo_config_directory:=$$CONFIG_DIR
+        robot_config_directory:=$$ROBOT_CONFIG_DIR
+        robot_namespace:=$$ROBOT_NAMESPACE
+        mode:=$$DEMO_MODE
+        trajectory_filename:=$$CONFIG_DIR/paths/recorded.traj
 
   rviz:  # open rviz
     extends:
       service: robot
     profiles: [optional]
-    command: rviz2 -d /config/default.rviz
+    command: rviz2 -d $$CONFIG_DIR/default.rviz
+
+  record:
+    extends:
+      service: robot
+    depends_on: [robot]
+    command: >-
+      ros2 launch tirrex_demo record.launch.py
+        demo_config_directory:=$$CONFIG_DIR
+        robot_config_directory:=$$ROBOT_CONFIG_DIR
+        robot_namespace:=$$ROBOT_NAMESPACE
+        mode:=$$DEMO_MODE
+        demo:=$$DEMO_NAME

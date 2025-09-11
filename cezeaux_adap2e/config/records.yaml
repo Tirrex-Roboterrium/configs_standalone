@@ -16,7 +16,5 @@ vcs: true
 # It is possible to use regular expression in topic names
 additional_topics:
   - .*/battery_status
-  - .*/gps/fix
-  - .*/imu
   - .*/filtered_odom
   - .*/path_matching/info
