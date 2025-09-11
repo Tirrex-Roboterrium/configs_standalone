@@ -2,12 +2,12 @@ services:
   robot:
     image: ghcr.io/tirrex-roboterrium/tirrex_workspace:full
     volumes:
-      - ./config:/config   # give the current configuration to the robot
-      - ./data:/data       # 
-      - /dev:/dev                                 # access devices (joystick, serial, ...)
-      - /etc/timezone:/etc/timezone:ro            # to use the correct date
-      - /etc/localtime:/etc/localtime:ro          # to use the correct date
-      - $HOME/.Xauthority:/root/.Xauthority:ro    # share the X11 magic cookie to open GUI
+      - ./config:/config                        # give the current configuration to the robot
+      - ./data:/data                            # data dir is used to save records
+      - /dev:/dev                               # access devices (joystick, serial, ...)
+      - /etc/timezone:/etc/timezone:ro          # to use the correct date
+      - /etc/localtime:/etc/localtime:ro        # to use the correct date
+      - $HOME/.Xauthority:/root/.Xauthority:ro  # share the X11 magic cookie to open GUI
     environment:
       - CONFIG_DIR=/config
       - ROBOT_CONFIG_DIR=/config/robot

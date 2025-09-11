@@ -20,7 +20,7 @@ You can do that automatically using the following program:
 ```
 ./autosync_config
 ```
-This program keeps listening every changes on these files and update them to the robot.
+This program keeps listening every changes on these files and uploads them to the robot.
 
 
 ## Start the programs on the robot
