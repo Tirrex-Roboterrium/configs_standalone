@@ -27,11 +27,13 @@ longitudinal_control:
     settling_distance: 5.0     # (unit: m) settling distance for lateral deviation
     convergence_ratio: 10.0    # (unit: -) ratio between lateral and angular dynamics (>3)
 
+  minimal_linear_speed: 0.3
+
 # configuration for classic and predictive lateral control laws
 lateral_control:
   # selected: classic
-  selected: predictive
-  # selected: front_rear_decoupled
+  # selected: predictive
+  selected: front_rear_decoupled
 
   classic:
     gains:
@@ -51,8 +53,8 @@ lateral_control:
 
   front_rear_decoupled:
     gains:
-      front_kp: 0.2
-      rear_kp: 0.2
+      front_kp: 0.4
+      rear_kp: 0.4
 
 sliding_observer:
   selected: none
