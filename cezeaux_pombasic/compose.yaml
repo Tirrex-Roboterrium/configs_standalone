@@ -105,6 +105,7 @@ services:
     extends:
       service: robot
     depends_on: [robot]
+    profiles: [optional]
     command: >-
       ros2 launch tirrex_demo record.launch.py
         demo_config_directory:=$$CONFIG_DIR
