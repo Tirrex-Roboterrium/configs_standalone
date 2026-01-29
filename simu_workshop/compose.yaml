@@ -1,0 +1,92 @@
+services:
+  simulator:
+    image: ghcr.io/tirrex-roboterrium/tirrex_workspace:full
+    volumes:
+      - ./config:/config                        # give the current configuration to the robot
+      - ./data:/data                            # data dir is used to save records
+      # - /dev:/dev                               # access devices (joystick, serial, ...)
+      - /etc/timezone:/etc/timezone:ro          # to use the correct date
+      - /etc/localtime:/etc/localtime:ro        # to use the correct date
+      - $HOME/.Xauthority:/root/.Xauthority:ro  # share the X11 magic cookie to open GUI
+      - /tmp/.X11-unix:/tmp/.X11-unix:ro        # contains the socket to access the X11 server
+    environment:
+      - CONFIG_DIR=/config
+      - ROBOT_CONFIG_DIR=/config/robot
+      - DEMO_MODE=simulation_gazebo_classic
+      - DEMO_NAME=simu_workshop
+      - ROBOT_NAMESPACE=robot
+      - ROS_LOG_DIR=/data/simu_workshop/log
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp  # specify the ROS2 library used to communicate
+      - CYCLONEDDS_URI=file:///config/cyclonedds.xml  # this file specify the net interface used
+      - DISPLAY                                  # share the current graphical server
+    network_mode: host
+    pid: host  # required for ROS2
+    ipc: host  # required for ROS2, Qt and X11 (for shared memory)
+    stop_signal: SIGINT  # Correctly forward SIGINT on services started with 'compose up'
+    userns_mode: keep-id
+    command: >-
+      ros2 launch tirrex_demo core.launch.py
+        demo_config_directory:=$$CONFIG_DIR
+        robot_config_directory:=$$ROBOT_CONFIG_DIR
+        robot_namespace:=$$ROBOT_NAMESPACE
+        mode:=$$DEMO_MODE
+
+  bash:  # open a shell in the tirrex workspace
+    extends:
+      service: simulator
+    command: bash
+
+  localisation:  # compute absolute localization using GNSS, IMU and odometry measurements
+    extends:
+      service: simulator
+    depends_on: [simulator]
+    command: >-
+      ros2 launch tirrex_demo robot_localisation.launch.py
+        demo_config_directory:=$$CONFIG_DIR
+        robot_config_directory:=$$ROBOT_CONFIG_DIR
+        robot_namespace:=$$ROBOT_NAMESPACE
+        mode:=$$DEMO_MODE
+
+  path_following:  # control the robot to follow the specified trajectory file
+    extends:
+      service: simulator
+    depends_on: [localisation]
+    command: >-
+      ros2 launch tirrex_demo robot_path_following.launch.py
+        demo_config_directory:=$$CONFIG_DIR
+        robot_config_directory:=$$ROBOT_CONFIG_DIR
+        robot_namespace:=$$ROBOT_NAMESPACE
+        mode:=$$DEMO_MODE
+        trajectory_filename:=test01.traj
+
+  path_recorder:  # record a trajectory file from the current localization
+    extends:
+      service: simulator
+    depends_on: [localisation]
+    profiles: [optional]
+    command: >-
+      ros2 launch tirrex_demo robot_path_recorder.launch.py
+        demo_config_directory:=$$CONFIG_DIR
+        robot_config_directory:=$$ROBOT_CONFIG_DIR
+        robot_namespace:=$$ROBOT_NAMESPACE
+        mode:=$$DEMO_MODE
+        trajectory_filename:=$$CONFIG_DIR/paths/recorded.traj
+
+  rviz:  # start evaluation nodes and publish information for rviz
+    extends:
+      service: simulator
+    profiles: [optional]
+    command: rviz2 -d $$CONFIG_DIR/default.rviz
+
+  record:
+    extends:
+      service: simulator
+    depends_on: [simulator]
+    profiles: [optional]
+    command: >-
+      ros2 launch tirrex_demo record.launch.py
+        demo_config_directory:=$$CONFIG_DIR
+        robot_config_directory:=$$ROBOT_CONFIG_DIR
+        robot_namespace:=$$ROBOT_NAMESPACE
+        mode:=$$DEMO_MODE
+        demo:=$$DEMO_NAME
