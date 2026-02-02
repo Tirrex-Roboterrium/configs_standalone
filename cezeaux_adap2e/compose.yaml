@@ -1,6 +1,6 @@
 services:
   robot:
-    image: ghcr.io/tirrex-roboterrium/tirrex_workspace:full-1.8
+    image: ghcr.io/tirrex-roboterrium/tirrex_workspace:full
     volumes:
       - ./config:/config                        # give the current configuration to the robot
       - ./data:/data                            # data dir is used to save records
