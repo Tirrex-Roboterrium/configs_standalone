@@ -13,7 +13,7 @@ ntrip:
     port: 2101
     username: centipede
     password: centipede
-    mountpoint: PHAC
+    mountpoint: NEAR
 configuration:
   type: drotek
   model: f9p
@@ -21,7 +21,7 @@ configuration:
   dual_antenna: false
 geometry:
   parent_link: base_link
-  xyz: [0.0, 0.0, 1.5]
+  xyz: [0.245, 0.12, 0.56]
 records:
   nmea_sentence: true
   gps_fix: false
