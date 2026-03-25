@@ -14,7 +14,7 @@ ntrip:
     port: 2101
     username: centipede
     password: centipede
-    mountpoint: PHAC
+    mountpoint: NEAR
 configuration:
   type: drotek
   model: f9p
