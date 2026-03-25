@@ -1,0 +1,18 @@
+name: lidar
+driver:
+  package: sick_scan_xd
+  executable: sick_generic_caller
+  parameters:
+    hostname: 192.168.0.11
+    port: "2112"
+configuration:
+  type: sick
+  model: mrs1xxx
+  resolution: 0.0625
+geometry:
+  parent_link: base_link
+  xyz: [3.05, 0.0, 0.68]
+  rpy: [0.0, 0.0, 0.0]
+records:
+  scan: false
+  cloud: true
