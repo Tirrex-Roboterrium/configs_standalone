@@ -1,0 +1,46 @@
+#!/bin/bash
+cd -- $(dirname "${BASH_SOURCE[0]}")
+
+if [[ -z "$1" ]] ; then
+  cat >&2 <<EOF
+Usage:  $0 [<user>@]<robot_name> [<dest_path>]
+
+  <user>: name of the user on the embedded computer of the robot.
+      If not specified, use your current username.
+  <robot_name>: hostname (or IP address) of the robot
+  <dest_path>: destination path used to copy this directory on the robot.
+      If not specified, it will create the same directory at the root of the home.
+
+Description:
+  This script transfers config files from the robot to this directory.
+  It does the opposite work of 'autosync_config' except it is done only once.
+  It can be useful to execute it sometimes when you have changed a file on the robot
+  (ex: download the rviz config after changing some parameters in the GUI).
+
+Example:
+  $0 pom4x4
+  $0 romea@ceol
+  $0 guest@adap2e01 test/example_workspace
+EOF
+  exit 1
+fi
+
+host="$1"
+remote_path="$2"
+ssh_cmd="ssh"
+sync_list='compose.yaml config'
+
+if [[ -z "$remote_path" ]] ; then
+  remote_path=$(basename -- "${PWD}")
+fi
+
+sync_files() {
+  rsync -ac --info=NAME -e "${ssh_cmd}" \
+    --exclude __pycache__  --exclude .git -- \
+    "${host}:${remote_path}/compose.yaml" ":${remote_path}/config" \
+    '.'
+}
+
+echo "Remote path: ${host}:${remote_path}"
+echo "Download files..."
+sync_files

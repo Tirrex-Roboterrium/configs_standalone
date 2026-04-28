@@ -18,16 +18,27 @@ You need to send the `config` directory and the `compose.yaml` file on the robot
 change the values locally.
 You can do that automatically using the following program:
 ```
-./autosync_config
+./autosync_config <user>@<robot>
 ```
 This program keeps listening every changes on these files and uploads them to the robot.
+Keep in mind that this script transfers files only in one way: from the host to the robot.
+
+### Download config files from the robot
+
+If you change config files directly on the robot and you want to get them back on your computer, you
+can execute
+```
+./download_config <user>@<robot>
+```
+Contrary to `autosync_config`, it does not listen changes and must be executed each time you want
+to get the files.
 
 
 ## Start the programs on the robot
 
 Open a shell on the robot using ssh
 ```
-ssh -X guest@pombasic
+ssh -X guest@adap2e01
 ```
 
 After that you have to go in the `standalone` directory
