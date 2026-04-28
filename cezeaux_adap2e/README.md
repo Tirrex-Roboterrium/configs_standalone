@@ -99,7 +99,7 @@ The service `record` is used to save the current configuration and sensor topics
 The configuration of the recording is specified in the `config/records.yaml` file.
 You can download these data on your computer using
 ```
-./sync_data
+./download_data
 ```
 This script will synchronize the `data` directory of the robot onto the local one.
 It will only transfer new files, so you can execute it regularly if you want to check the result
